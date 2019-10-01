@@ -1,12 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { createStore } from 'redux';
+
 import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import Root from './components/Root';
+import { createStoreEnhancer } from './store';
+import reducers from './reducers';
+import { latest } from './apis/xkcd';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const api = {
+    xkcd: {
+        latest
+    }
+};
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const storeEnhancer = createStoreEnhancer(api);
+const store = createStore(reducers, storeEnhancer);
+
+const props = {
+    store
+};
+
+ReactDOM.render(<Root { ...props } />, document.getElementById('root'));
+
