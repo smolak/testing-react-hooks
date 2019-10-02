@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-export default function UseEffectComponent({ anAction, cleanupAction, dependantProp }) {
+import { latest } from '../../actions/xkcd';
+
+const byeBye = () => console.log('Bye bye!');
+
+export default function UseEffectComponent({ anAction = latest, cleanupAction = byeBye, dependantProp }) {
     useEffect(() => {
         anAction();
 
