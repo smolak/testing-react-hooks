@@ -5,7 +5,7 @@ import { latest } from '../../actions/xkcd';
 import Xkcd from './Xkcd';
 
 export const mapStateToProps = (state) => ({
-    episode: state.xkcd.episode
+    fetchStatus: state.xkcd.fetchStatus
 });
 
 export const mapDispatchToProps = {
