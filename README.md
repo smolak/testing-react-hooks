@@ -1,68 +1,41 @@
+# Testing React Hooks
+
+In this repo I will try to test React's hooks by using only [`shallow`](https://airbnb.io/enzyme/docs/api/shallow.html) rendering of [`enzyme`](https://airbnb.io/enzyme/) testing tool.
+
+There are few rules to that:
+
+1. I will only use `shallow` to render components.
+   
+   What that means is that I will avoid deep (using [`mount`](https://airbnb.io/enzyme/docs/api/mount.html)) rendering. This requirement is about not having to have to prepare dependencies (e.g. store) for any child component(s) the component under the test will also render.
+   
+2. I will try to avoid mocking global and local imports to stub methods of those imports.
+
+   Meaning, I will try to avoid using https://jestjs.io/docs/en/manual-mocks#mocking-node-modules (as I am using Jest for tests here).
+   
+3. I will use the newest version of React, enzyme and Jest to do so.
+
+   I will update them every now and then and improve the tests if any of the tools will allow me to do so.
+   
+## State of what's been done 
+
+List taken from https://reactjs.org/docs/hooks-reference.html
+
+### Basic Hooks
+
+ - [x] useState [ [code example](https://github.com/smolak/testing-react-hooks/tree/master/src/components/UseStateComponent), [reference](https://reactjs.org/docs/hooks-reference.html#usestate) ]
+ - [ ] useEffect
+ - [ ] useContext
+ 
+### Additional Hooks
+
+ - [ ] useReducer
+ - [ ] useCallback
+ - [ ] useMemo
+ - [ ] useRef
+ - [ ] useImperativeHandle
+ - [ ] useLayoutEffect
+ - [ ] useDebugValue
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
