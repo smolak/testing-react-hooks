@@ -12,9 +12,9 @@ SomeComponent.propTypes = {
     name: PropTypes.string.isRequired
 };
 
-const props = { name: 'John Rambo' };
+const defaultProps = { name: 'John Rambo' };
 
-function render(hookDependencies) {
+function render(hookDependencies, props = defaultProps) {
     const WrappedComponent = withUseEffect(hookDependencies, SomeComponent);
 
     return mount(<WrappedComponent { ...props } />);
@@ -22,79 +22,154 @@ function render(hookDependencies) {
 
 describe('withUseEffect higher order function', () => {
     it('should return a wrapped component, one that was passed, for which the useEffect hook will be used', () => {
-        const wrappedComponent = render({ action: () => {} });
+        const hookConfig = { actionName: 'fetchSomething' };
+        const props = {
+            ...defaultProps,
+            fetchSomething: jest.fn()
+        };
+        const wrappedComponent = render(hookConfig, props);
         const name = wrappedComponent.find('[data-testid="name"]').text();
 
-        expect(name).toEqual(props.name);
+        expect(name).toEqual(defaultProps.name);
     });
 
-    it('should call the action passed (can be changed to handle a collection of them)', () => {
-        const hookDependencies = { action: jest.fn() };
+    it('should call the action using hook', () => {
+        const hookConfig = { actionName: 'fetchSomething' };
+        const props = {
+            ...defaultProps,
+            fetchSomething: jest.fn()
+        };
 
-        render(hookDependencies);
+        render(hookConfig, props);
 
-        expect(hookDependencies.action).toHaveBeenCalled();
+        expect(props.fetchSomething).toHaveBeenCalled();
+        expect(props.fetchSomething).toHaveBeenCalledTimes(1);
     });
 
     describe('when a prop change, that the useEffect depends on', () => {
         it('should call the action again', () => {
-            // The `dependantProp` can easily be extended to a list of props for which the useEffect
-            // will call the action, should they (props) change.
             const hookDependencies = {
-                action: jest.fn(),
-                dependantProp: 'name'
+                actionName: 'fetchSomething',
+                dependantPropNames: [ 'name' ]
             };
-            const wrappedComponent = render(hookDependencies);
+            const props = {
+                ...defaultProps,
+                name: 'John Rambo',
+                fetchSomething: jest.fn()
+            };
+            const wrappedComponent = render(hookDependencies, props);
 
-            expect(hookDependencies.action).toHaveBeenCalledTimes(1);
+            expect(props.fetchSomething).toHaveBeenCalledTimes(1);
 
             wrappedComponent.setProps({ name: 'Arnold S.' });
 
-            expect(hookDependencies.action).toHaveBeenCalledTimes(2);
+            expect(props.fetchSomething).toHaveBeenCalledTimes(2);
         });
     });
 
     describe('when a prop that the useEffect depends on does NOT change', () => {
         it('should call the action once', () => {
             const hookDependencies = {
-                action: jest.fn(),
-                dependantProp: 'name'
+                actionName: 'fetchSomething',
+                dependantPropNames: [ 'name' ]
             };
-            const wrappedComponent = render(hookDependencies);
+            const props = {
+                ...defaultProps,
+                fetchSomething: jest.fn()
+            };
+            const wrappedComponent = render(hookDependencies, props);
 
-            expect(hookDependencies.action).toHaveBeenCalledTimes(1);
+            expect(props.fetchSomething).toHaveBeenCalledTimes(1);
 
             wrappedComponent.setProps({ name: props.name });
 
-            expect(hookDependencies.action).toHaveBeenCalledTimes(1);
+            expect(props.fetchSomething).toHaveBeenCalledTimes(1);
         });
     });
 
     it('should call another action on cleanup', () => {
         const hookDependencies = {
-            action: jest.fn(),
-            dependantProp: 'name',
-            cleanupAction: jest.fn()
+            actionName: 'fetchSomething',
+            cleanupActionName: 'byeBye',
+            dependantPropNames: [ 'name' ]
         };
-        const wrappedComponent = render(hookDependencies);
+        const props = {
+            ...defaultProps,
+            fetchSomething: jest.fn(),
+            byeBye: jest.fn()
+        };
+        const wrappedComponent = render(hookDependencies, props);
 
         wrappedComponent.unmount();
 
-        expect(hookDependencies.cleanupAction).toHaveBeenCalledTimes(1);
+        expect(props.byeBye).toHaveBeenCalled();
+        expect(props.byeBye).toHaveBeenCalledTimes(1);
     });
 
-    it('should be possible to stack withUseEffect if you want to have independent usages of each effect', () => {
-        const hookDependencies1 = { action: jest.fn() };
-        const hookDependencies2 = { action: jest.fn() };
-        const fetchSomething1 = (Component) => withUseEffect(hookDependencies1, Component);
-        const fetchSomething2 = (Component) => withUseEffect(hookDependencies2, Component);
+    it('should pass all of the actions and dependant props to rendered component', () => {
+        const hookDependencies = {
+            actionName: 'fetchSomething',
+            cleanupActionName: 'byeBye',
+            dependantPropNames: [ 'name' ]
+        };
+        const props = {
+            ...defaultProps,
+            fetchSomething: jest.fn(),
+            byeBye: jest.fn()
+        };
+        const wrappedComponent = render(hookDependencies, props);
+        const { name, fetchSomething, byeBye } = wrappedComponent.props();
 
-        // use pipe if you want to stack more hooks nicer
-        const WrappedComponent = fetchSomething1(fetchSomething2(SomeComponent));
+        expect(name).toEqual(props.name);
+        expect(fetchSomething).toEqual(props.fetchSomething);
+        expect(byeBye).toEqual(props.byeBye);
+    });
 
-        mount(<WrappedComponent { ...props } />);
+    describe('if you want to have independent usages of each effect (and e.g. store them as modules)', () => {
+        it('should be possible', () => {
+            const hookDependencies1 = { actionName: 'fetchSomething1' };
+            const hookDependencies2 = { actionName: 'fetchSomething2' };
+            const props = {
+                ...defaultProps,
+                fetchSomething1: jest.fn(),
+                fetchSomething2: jest.fn()
+            };
 
-        expect(hookDependencies1.action).toHaveBeenCalledTimes(1);
-        expect(hookDependencies2.action).toHaveBeenCalledTimes(1);
+            const fetchSomething1 = (Component) => withUseEffect(hookDependencies1, Component);
+            const fetchSomething2 = (Component) => withUseEffect(hookDependencies2, Component);
+
+            // use pipe if you want to stack more hooks nicer
+            const WrappedComponent = fetchSomething2(fetchSomething1(SomeComponent));
+
+            mount(<WrappedComponent { ...props } />);
+
+            expect(props.fetchSomething1).toHaveBeenCalled();
+            expect(props.fetchSomething1).toHaveBeenCalledTimes(1);
+
+            expect(props.fetchSomething2).toHaveBeenCalled();
+            expect(props.fetchSomething2).toHaveBeenCalledTimes(1);
+
+            expect(props.fetchSomething1).toHaveBeenCalledBefore(props.fetchSomething2);
+        });
+
+        it('should still return a wrapped component', () => {
+            const hookDependencies1 = { actionName: 'fetchSomething1' };
+            const hookDependencies2 = { actionName: 'fetchSomething2' };
+            const props = {
+                ...defaultProps,
+                fetchSomething1: jest.fn(),
+                fetchSomething2: jest.fn()
+            };
+
+            const fetchSomething1 = (Component) => withUseEffect(hookDependencies1, Component);
+            const fetchSomething2 = (Component) => withUseEffect(hookDependencies2, Component);
+
+            const WrappedComponent = fetchSomething2(fetchSomething1(SomeComponent));
+
+            const wrappedComponent = mount(<WrappedComponent { ...props } />);
+            const name = wrappedComponent.find('[data-testid="name"]').text();
+
+            expect(name).toEqual(defaultProps.name);
+        });
     });
 });

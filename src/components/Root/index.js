@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
 
 import Xkcd from '../Xkcd';
+import UseEffect from '../UseEffect';
 
 export default class Root extends React.Component {
     static propTypes = {
@@ -12,7 +13,7 @@ export default class Root extends React.Component {
     render() {
         return (
             <Provider store={ this.props.store }>
-                <Xkcd />
+                <UseEffect />
             </Provider>
         );
     }

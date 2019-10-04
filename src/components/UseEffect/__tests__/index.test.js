@@ -6,8 +6,8 @@ import { AComponent } from '../index';
 describe('AComponent', () => {
     it('should render its contents (or whatever is happening with that component)', () => {
         const aComponent = shallow(<AComponent />);
-        const xkcd = aComponent.find('[data-testid="xkcd"]');
+        const episode = aComponent.find('[data-testid="episode"]');
 
-        expect(xkcd).toHaveLength(1);
+        expect(episode).toHaveLength(1);
     });
 });
