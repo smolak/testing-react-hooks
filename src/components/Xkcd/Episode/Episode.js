@@ -1,5 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+
+import shapes from '../../../shapes';
 
 export default function Episode({ episode }) {
     return (
@@ -11,9 +12,5 @@ export default function Episode({ episode }) {
 }
 
 Episode.propTypes = {
-    episode: PropTypes.shape({
-        title: PropTypes.string.isRequired,
-        img: PropTypes.string.isRequired,
-        alt: PropTypes.string.isRequired
-    })
+    episode: shapes.Episode
 };
